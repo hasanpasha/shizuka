@@ -1,6 +1,5 @@
 
-from enum import Enum, auto
 
-class Kinds(Enum):
-    MOVIES = auto
-    SERIES = auto()
+class Kinds:
+    MOVIES = 'movies'
+    SERIES = 'series'
