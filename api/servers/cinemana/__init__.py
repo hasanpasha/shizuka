@@ -41,7 +41,7 @@ class Cinemana(Server):
 
         return json.loads(resp.text)
     
-    def search(self, keyword: str, **kwargs) -> List[dict[str, str]]:
+    def search(self, keyword: str, **kwargs) -> List[dict[str, str, str]]:
         """Search for the media."""
         
         def buildURL(keyword, **kwargs):
@@ -68,7 +68,7 @@ class Cinemana(Server):
             return
 
         return [
-            dict(name=item['en_title'], slug=item['nb'])
+            dict(name=item['en_title'], year=item['year'], slug=item['nb'])
              for item in json_data ]
 
 
