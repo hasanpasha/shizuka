@@ -27,7 +27,7 @@ class Cinemana(Server):
     translations = base_api + '/android/translationFiles/id/{0}'
 
     def __init__(self):
-        print(f"{self.id}: initializing...")
+        # print(f"{self.id}: initializing...")
         if self.session is None:
             self.session = requests.Session()
 
@@ -37,7 +37,7 @@ class Cinemana(Server):
         if resp.status_code != 200:
             return 
 
-        print(resp.url)
+        # print(resp.url)
 
         return json.loads(resp.text)
     
