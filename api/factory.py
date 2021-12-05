@@ -1,11 +1,12 @@
 
 from api import servers
+from typing import List
 
 class Factory:
     """This will handle the servers"""
 
     @property
-    def servers_list(self) -> list:
+    def servers_list(self) -> List:
         list_of_servers = servers.get_servers_list()
         if list_of_servers != None:
             return list_of_servers
