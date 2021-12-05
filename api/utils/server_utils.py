@@ -1,36 +1,32 @@
 
 from api import factory
 from api.factory import Factory
+from typing import List
 
-FACTORY_INITIATED: bool = False
 
-def get_class_by_id(id: str):
+class ServerUtils:
 
-    # Get class info from list of servers
-    def get_class_info(id: str):
-        for server in get_list_of_servers():
-            if server['id']:
-                return server
+    def __init__(self) -> None:
+        self.factory = Factory()
 
-    return factory.get_server_class(get_class_info(id))
+    def get_class_by_id(self, id: str):
 
-def initiate_factory():
-    global FACTORY_INITIATED
-    if not FACTORY_INITIATED:
-        global factory
-        factory = Factory()
-        FACTORY_INITIATED = True
+        # Get class info from list of servers
+        def get_class_info(id: str):
+            for server in self.servers_list:
+                if server['id']:
+                    return server
 
-def get_list_of_servers():
-    initiate_factory()
-    return factory.servers_list
-    
-def list_servers():
-    servers_list = get_list_of_servers()
+        return self.factory.get_server_class(get_class_info(id))
 
-    for server in servers_list:
-        print(server['id'])
+    @property
+    def servers_list(self):
+        return self.factory.servers_list
+        
+    def list_servers(self):
+        for server in self.servers_list:
+            print(server['id'])
 
-def get_id_list():
-    servers_list = get_list_of_servers()
-    return [server['id'] for server in servers_list]
+    @property
+    def get_id_list(self) -> List:
+        return [server['id'] for server in self.servers_list]
