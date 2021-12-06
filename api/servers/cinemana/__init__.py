@@ -107,11 +107,14 @@ class Cinemana(Server):
         if json_data == None:
             return
 
-        return [
-            dict(
-                lang=trans['name'],
-                extension=trans['extention'],
-                fileURL=trans['file']
-            )
-            for trans in json_data['translations']
-        ]
+        try:
+            return [
+                dict(
+                    lang=trans['name'],
+                    extension=trans['extention'],
+                    fileURL=trans['file']
+                )
+                for trans in json_data['translations']
+            ]
+        except KeyError:
+            return
