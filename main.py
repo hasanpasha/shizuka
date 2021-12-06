@@ -205,7 +205,6 @@ class Main:
             
 
             try:
-                # try:
                 s_n = chosed_season['season']
                 
                 # if choesn bigger >= first season number, and <= number of seasons
@@ -242,15 +241,14 @@ class Main:
             try:
                 e_n = chosed_episode['episode']
                 
-                try:
-                    # if choesn bigger >= first episode number, and <= number of episodes
-                    if (int(e_n) >= int(default_episode()) and 
-                    int(e_n) <= len((seasons[season_number]))):
-                        return e_n
+                # if choesn bigger >= first episode number, and <= number of episodes
+                if (int(e_n) >= int(default_episode()) and 
+                int(e_n) <= len((seasons[season_number]))):
+                    return e_n
 
-                # if the user input is not number  
-                except ValueError:
-                    print("Pleas Enter a number :(")
+            # if the user input is not number  
+            except ValueError:
+                print("Pleas Enter a number :(")
 
             # if there is just one episode
             except KeyError:
