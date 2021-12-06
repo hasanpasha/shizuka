@@ -10,7 +10,7 @@ first, download the source code:
 git clone https://github.com/hasanpasha/stream-cli/
 ```
 ```
-cd stream-cli/
+cd stream-cli
 ```
 Now you need to get the reuqired packages:
 ```
