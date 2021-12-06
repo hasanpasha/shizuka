@@ -7,10 +7,10 @@
 ## Usage
 first, download the source code:
 ```
-git clone https://github.com/hasanpasha/stream-cli/
+git https://github.com/hasanpasha/shizuka
 ```
 ```
-cd stream-cli/
+cd shizuka
 ```
 Now you need to get the reuqired packages:
 ```
