@@ -14,7 +14,10 @@ Now you need to get the reuqired packages:
 ```
 pip install -r requirments.txt
 ```
-
+To run the app:
+```
+python main.py
+```
 
 ### Disclaimer
-#### The developer of this application does not have any affiliation with the content providers available.
+The developer of this application does not have any affiliation with the content providers available.
