@@ -1,6 +1,5 @@
 
-# stream-cli
-## a command line tool to watch movies and series
+# shizuka
 
 ## Usage
 first, download the source code:
