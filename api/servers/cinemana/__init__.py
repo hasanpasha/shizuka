@@ -37,8 +37,6 @@ class Cinemana(Server):
         if resp.status_code != 200:
             return 
 
-        # print(resp.url)
-
         return json.loads(resp.text)
     
     def search(self, keyword: str, **kwargs) -> List[dict[str, str, str]]:
@@ -101,7 +99,7 @@ class Cinemana(Server):
         ]
 
 
-    def getTranslations(self, slug: str) -> List[dict[str, str]]:
+    def getTranslations(self, slug: str) -> List[dict[str, str, str]]:
         translation_url = self.translations.format(slug)
 
         json_data  = self.get_data(translation_url)
@@ -110,6 +108,10 @@ class Cinemana(Server):
             return
 
         return [
-            dict(lang=trans['type'], fileURL=trans['file'])
+            dict(
+                lang=trans['name'],
+                extension=trans['extention'],
+                fileURL=trans['file']
+            )
             for trans in json_data['translations']
         ]
