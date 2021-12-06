@@ -7,7 +7,7 @@
 ## Usage
 first, download the source code:
 ```
-git https://github.com/hasanpasha/shizuka
+git clone https://github.com/hasanpasha/shizuka
 ```
 ```
 cd shizuka
