@@ -1,6 +1,9 @@
 
 # shizuka
 
+## Available sites
+- [cinemana](https://cinemana.shabakaty.com/) [only in Iraq]
+
 ## Usage
 first, download the source code:
 ```
