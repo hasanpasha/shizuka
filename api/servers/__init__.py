@@ -6,6 +6,7 @@ import inspect
 import importlib
 from enum import Enum, auto
 from abc import ABC
+from requests.exceptions import ConnectionError
 
 # from operator import itemgetter
 # import os
@@ -43,13 +44,17 @@ class Server(ABC):
         self.__sessions[self.id] = session
 
     def session_get(self, *args, **kwargs):
-        """ Get data method """
+        """ get method """
         try:
             resp = self.session.get(*args, **kwargs)
-        except:
-            raise
 
-        return resp        
+        except ConnectionError:
+            print(
+                f"Connection error: please check you network connection..")
+            exit(1)
+
+        else:
+            return resp        
 
     
 # @lru_cache()
