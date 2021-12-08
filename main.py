@@ -14,6 +14,7 @@ import subprocess
 class Defaults:
     SERVER = 'cinemana'
     KIND = Kinds.MOVIES
+    DEFAULT_MPV_OPTIONS = ['--no-terminal']
 
 
 
@@ -89,7 +90,8 @@ class Main:
             chosed_media_slug = self._choose_media(search_result)
 
             if search_options['media_type'] == Kinds.MOVIES:
-                player = self._video_player(chosed_media_slug)
+                player = self._video_player(
+                    chosed_media_slug, Defaults.DEFAULT_MPV_OPTIONS)
                 if player:
                     continue
 
@@ -98,7 +100,7 @@ class Main:
 
                 while True:
                     chosed_episode_slug = self._get_episode_slug(episodes)
-                    player = self._video_player(chosed_episode_slug)
+                    player = self._video_player(chosed_episode_slug, Defaults.DEFAULT_MPV_OPTIONS)
                     if player and self._continue(msg="do you wnat to play another episode: "):
                         clear_console()
                         continue
@@ -106,7 +108,9 @@ class Main:
                 
     
     # MPV Video Player
-    def _video_player(self, slug: str, active: bool = True) -> bool:
+    def _video_player(self, slug: str, player_options: List, verbose: bool = False) -> bool:
+        """The video player method uses mpv as default. """
+
         chosed_quality_url: str = self._choose_quality(slug)
         trans_files: List = self._get_trans_files(slug)
 
@@ -121,16 +125,26 @@ class Main:
             for t in trans_files:
                 cmd_args.append(f"--sub-file={t}")
 
-        # execute command line command
-        player_process = subprocess.Popen(cmd_args)
+        if len(player_options) >= 1:
+            cmd_args.extend(player_options)
 
-        print('$ ' + ' '.join(cmd_args))
-        while active:
-            if player_process.poll() != None:
-                break
+        if verbose:
+            print('$ ' + ' '.join(cmd_args))
 
-        player_process.terminate()
-        return True
+        try:
+            # execute command line command
+            player_process = subprocess.Popen(cmd_args)
+            
+            while True:
+                if player_process.poll() != None:
+                    break
+
+        except KeyboardInterrupt:
+            exit(1)
+
+        else:
+            player_process.terminate()
+            return True
 
     def _continue(self, default: bool = True, msg: str = "do you wanna to continue") -> bool:
         choice =  prompt([
