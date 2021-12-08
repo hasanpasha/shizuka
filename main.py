@@ -121,6 +121,7 @@ class Main:
         
         cmd_args.append(f"{chosed_quality_url}")
 
+        # if any sub has been chosen
         if len(trans_files) >= 1:
             for t in trans_files:
                 cmd_args.append(f"--sub-file={t}")
@@ -177,6 +178,9 @@ class Main:
 
     def _get_trans_files(self, slug: str) -> List:
         trans_list = self.server.getTranslations(slug)
+
+        if trans_list == None:
+            return []   # return empty list
 
         _list = [ dict(
                 name=f"{tran['lang'].strip()} ({tran['extension'].strip()})",
