@@ -32,11 +32,56 @@ class Main:
         # properties
         self.server = None
 
+        # currenly playing media info
+        self._media_info = {
+            'name': None,
+            'kind': None,
+            'season': None,
+            'episode': None,
+        }
+
         clear_console()  # Clear cmd when start
         self.choose_server()    # Run one time on start to select the server
         
 
         # To add args...
+    
+    @property
+    def _media_name(self) -> str:
+        return self._media_info['name']
+
+    @_media_name.setter
+    def _media_name(self, name: str) -> None:
+        self._media_info['name'] = name
+
+    @property
+    def _media_kind(self) -> Kinds:
+        return self._media_info['kind']
+
+    @_media_kind.setter
+    def _media_kind(self, kind: Kinds) -> None:
+        self._media_info['kind'] = kind
+
+    @property
+    def _media_season(self) -> int:
+        return self._media_info['season']
+
+    @_media_season.setter
+    def _media_season(self, season: int) -> None:
+        self._media_info['season'] = season
+    
+    @property
+    def _media_episode(self) -> int:
+        return self._media_info['episode']
+
+    @_media_episode.setter
+    def _media_episode(self, episode: int) -> None:
+        self._media_info['episode'] = episode    
+
+
+    def _clear_media_info(self):
+        for key in self._media_info.keys():
+            self._media_info[key] = None
          
     def choose_server(self):
         if self.server != None:
@@ -76,6 +121,7 @@ class Main:
 
             if not first_run:
                 clear_console()
+                self._clear_media_info()
                 if not self._continue("Continue: "):
                     break
             
@@ -84,18 +130,22 @@ class Main:
             search_options = self._get_search_options
             if not search_options['search_key'] or not search_options['perform_search']:
                 continue
+
+            # edit media info
+            self._media_name = search_options['search_key']
+            self._media_kind = search_options['media_type']
             
             search_result = self.server.search(
-                search_options['search_key'], kind=search_options['media_type'])
+                search_options['search_key'], kind=self._media_kind)
             chosed_media_slug = self._choose_media(search_result)
 
-            if search_options['media_type'] == Kinds.MOVIES:
+            if self._media_kind == Kinds.MOVIES:
                 player = self._video_player(
                     chosed_media_slug, Defaults.DEFAULT_MPV_OPTIONS)
                 if player:
                     continue
 
-            elif search_options['media_type'] == Kinds.SERIES:
+            elif self._media_kind == Kinds.SERIES:
                 episodes = self.server.getEpisodes(chosed_media_slug)
 
                 while True:
@@ -170,8 +220,8 @@ class Main:
 
             this_season[s['episode']] = s['slug']
 
-        season_number = self._get_season_number(seasons)
-        episode_number = self._get_episode_number(seasons, season_number)
+        season_number = self._media_season = self._get_season_number(seasons)
+        episode_number = self._media_episode = self._get_episode_number(seasons, season_number)
 
         return seasons[season_number][episode_number]
 
