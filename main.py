@@ -13,17 +13,16 @@ import subprocess
 
 class Defaults:
     SERVER = 'cinemana'
+    DATA_FOLDER = os.path.join(os.getcwd(), 'data')
+    SCREENSHOTS_FOLDER = os.path.join(DATA_FOLDER, 'screenshots')
     KIND = Kinds.MOVIES
     DEFAULT_MPV_OPTIONS = ['--no-terminal']
-
-
 
 def clear_console():
     command = 'clear'
     if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
         command = 'cls'
     os.system(command)
-
 
 class Main:
     """ main app that run servers and get user commands """
@@ -132,7 +131,6 @@ class Main:
                 continue
 
             # edit media info
-            self._media_name = search_options['search_key']
             self._media_kind = search_options['media_type']
             
             search_result = self.server.search(
@@ -180,6 +178,41 @@ class Main:
 
         if verbose:
             print('$ ' + ' '.join(cmd_args))
+
+        # Save screenshots to data folder, with seperating medias
+        # First make sure the data folder exist, if not make one
+        if not os.path.exists(Defaults.DATA_FOLDER):
+            os.mkdir(Defaults.DATA_FOLDER)
+
+        # check for screenshots folder existance, or make one
+        if not os.path.exists(Defaults.SCREENSHOTS_FOLDER):
+            os.mkdir(Defaults.SCREENSHOTS_FOLDER)
+
+        media_screenshots_path = os.path.join(
+            Defaults.SCREENSHOTS_FOLDER,
+            self._media_name
+        )
+        # check if the playing media have already folder, if not make one
+        if not os.path.exists(media_screenshots_path):
+            os.mkdir(media_screenshots_path)
+
+        # Set directory, and quality for screenshots
+        cmd_args.extend([
+            # The path screenshots saved to
+            f"--screenshot-directory={media_screenshots_path}",
+            f"--screenshot-jpeg-quality={100}",
+        ])
+
+        # change screenshot filename template
+        if self._media_kind == Kinds.MOVIES:
+            cmd_args.append(
+                f"--screenshot-template=%P",    # %p: Current playback time
+            )
+
+        elif self._media_kind == Kinds.SERIES:
+            cmd_args.append(
+                f"--screenshot-template=s{self._media_season}-e{self._media_episode}-%P"
+            )
 
         try:
             # execute command line command
@@ -351,6 +384,8 @@ class Main:
         ])
         for i in _list:
             if i['name'] == select_media['media_choice']:
+                # set_media_name
+                self._media_name = i['name']
                 return i['slug']
         
 
