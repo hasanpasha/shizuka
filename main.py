@@ -139,25 +139,24 @@ class Main:
             chosed_media_slug = self._choose_media(search_result)
 
             if self._media_kind == Kinds.MOVIES:
-                player = self._video_player(
-                    chosed_media_slug, Defaults.DEFAULT_MPV_OPTIONS)
-                if player:
-                    continue
+                self._video_player(chosed_media_slug, Defaults.DEFAULT_MPV_OPTIONS)
+                continue
 
             elif self._media_kind == Kinds.SERIES:
                 episodes = self.server.getEpisodes(chosed_media_slug)
 
                 while True:
                     chosed_episode_slug = self._get_episode_slug(episodes)
-                    player = self._video_player(chosed_episode_slug, Defaults.DEFAULT_MPV_OPTIONS)
-                    if player and self._continue(msg="do you wnat to play another episode: "):
+                    self._video_player(chosed_episode_slug, Defaults.DEFAULT_MPV_OPTIONS)
+                    if self._continue(msg="do you wnat to play another episode: "):
                         clear_console()
                         continue
                     break
-                
-    
+            # since this is the end it will return to 
+            #+ the beginning of the main loop, just like using continue
+
     # MPV Video Player
-    def _video_player(self, slug: str, player_options: List, verbose: bool = False) -> bool:
+    def _video_player(self, slug: str, player_options: List, verbose: bool = False) -> None:
         """The video player method uses mpv as default. """
 
         chosed_quality_url: str = self._choose_quality(slug)
@@ -220,15 +219,14 @@ class Main:
         while True:
             video_process: bool = video_player.play_video(cmd_args)
             if video_process:   # if process returned True
-                return video_process    
-
-            else:   # On error
-                print("Error on playing the videos...")
-                # Ask to retry playing the video
-                if self._continue(msg="Retry playing the video: "):
-                    continue
-                else:   # Else return True
-                    return True
+                break   # end the loop
+            
+            # On error, Ask to retry playing the video
+            elif self._continue(msg="Error on playing the videos, Retry? "):
+                continue    
+            
+            else:   # Else end the loop and return to the main loop
+                break  
 
     def _continue(self, default: bool = True, msg: str = "do you wanna to continue") -> bool:
         choice =  prompt([
