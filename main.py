@@ -5,6 +5,7 @@
 # from _typeshed import Self
 # import argparse
 from utils.server_utils import ServerUtils
+from utils.video_player import MPVVideoPlayer
 from api.constants import Kinds
 from PyInquirer import prompt
 from typing import List
@@ -214,20 +215,10 @@ class Main:
                 f"--screenshot-template=s{self._media_season}-e{self._media_episode}-%P"
             )
 
-        try:
-            # execute command line command
-            player_process = subprocess.Popen(cmd_args)
-            
-            while True:
-                if player_process.poll() != None:
-                    break
-
-        except KeyboardInterrupt:
-            exit(1)
-
-        else:
-            player_process.terminate()
-            return True
+        # start playing the video
+        video_player = MPVVideoPlayer()
+        video_process = video_player.play_video(cmd_args)
+        return video_process
 
     def _continue(self, default: bool = True, msg: str = "do you wanna to continue") -> bool:
         choice =  prompt([
