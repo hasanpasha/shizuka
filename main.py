@@ -1,23 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# from sys import argv
-# from _typeshed import Self
-# import argparse
 from utils.server_utils import ServerUtils
 from utils.video_player import MPVVideoPlayer
 from api.constants import Kinds
 from PyInquirer import prompt
-from typing import Counter, List
+from typing import List
 import os
-import subprocess
 
 class Defaults:
     SERVER = 'cinemana'
     DATA_FOLDER = os.path.join(os.getcwd(), 'data')
     SCREENSHOTS_FOLDER = os.path.join(DATA_FOLDER, 'screenshots')
     KIND = Kinds.MOVIES
-    DEFAULT_MPV_OPTIONS = ['--no-terminal']
 
 def clear_console():
     command = 'clear'
@@ -118,7 +113,6 @@ class Main:
     def run(self, first_run: bool = True) -> None:
         while True:
             # get user commands
-
             if not first_run:
                 clear_console()
                 self._clear_media_info()
@@ -139,7 +133,7 @@ class Main:
             chosed_media_slug = self._choose_media(search_result)
 
             if self._media_kind == Kinds.MOVIES:
-                self._video_player(chosed_media_slug, Defaults.DEFAULT_MPV_OPTIONS)
+                self._video_player(chosed_media_slug)
                 continue
 
             elif self._media_kind == Kinds.SERIES:
@@ -147,7 +141,7 @@ class Main:
 
                 while True:
                     chosed_episode_slug = self._get_episode_slug(episodes)
-                    self._video_player(chosed_episode_slug, Defaults.DEFAULT_MPV_OPTIONS)
+                    self._video_player(chosed_episode_slug)
                     if self._continue(msg="do you wnat to play another episode: "):
                         clear_console()
                         continue
@@ -156,7 +150,7 @@ class Main:
             #+ the beginning of the main loop, just like using continue
 
     # MPV Video Player
-    def _video_player(self, slug: str, player_options: List, verbose: bool = False) -> None:
+    def _video_player(self, slug: str, verbose: bool = False) -> None:
         """The video player method uses mpv as default. """
 
         chosed_quality_url: str = self._choose_quality(slug)
@@ -173,8 +167,8 @@ class Main:
             for t in trans_files:
                 cmd_args.append(f"--sub-file={t}")
 
-        if len(player_options) >= 1:
-            cmd_args.extend(player_options)
+        # no terminal output
+        cmd_args.append("--no-terminal")
 
         if verbose:
             print('$ ' + ' '.join(cmd_args))
