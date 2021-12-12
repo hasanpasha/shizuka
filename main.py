@@ -4,7 +4,7 @@
 # from sys import argv
 # from _typeshed import Self
 # import argparse
-from api.utils.server_utils import ServerUtils
+from utils.server_utils import ServerUtils
 from api.constants import Kinds
 from PyInquirer import prompt
 from typing import List
