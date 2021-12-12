@@ -8,7 +8,7 @@ from utils.server_utils import ServerUtils
 from utils.video_player import MPVVideoPlayer
 from api.constants import Kinds
 from PyInquirer import prompt
-from typing import List
+from typing import Counter, List
 import os
 import subprocess
 
@@ -217,8 +217,18 @@ class Main:
 
         # start playing the video
         video_player = MPVVideoPlayer()
-        video_process = video_player.play_video(cmd_args)
-        return video_process
+        while True:
+            video_process: bool = video_player.play_video(cmd_args)
+            if video_process:   # if process returned True
+                return video_process    
+
+            else:   # On error
+                print("Error on playing the videos...")
+                # Ask to retry playing the video
+                if self._continue(msg="Retry playing the video: "):
+                    continue
+                else:   # Else return True
+                    return True
 
     def _continue(self, default: bool = True, msg: str = "do you wanna to continue") -> bool:
         choice =  prompt([
