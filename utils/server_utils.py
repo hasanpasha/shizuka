@@ -1,5 +1,4 @@
 
-from api import factory
 from api.factory import Factory
 from typing import List
 

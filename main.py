@@ -1,28 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# from sys import argv
-# from _typeshed import Self
-# import argparse
-from api.utils.server_utils import ServerUtils
+from utils.server_utils import ServerUtils
+from utils.video_player import MPVVideoPlayer
 from api.constants import Kinds
 from PyInquirer import prompt
 from typing import List
 import os
-import subprocess
 
 class Defaults:
     SERVER = 'cinemana'
+    DATA_FOLDER = os.path.join(os.getcwd(), 'data')
+    SCREENSHOTS_FOLDER = os.path.join(DATA_FOLDER, 'screenshots')
     KIND = Kinds.MOVIES
-
-
 
 def clear_console():
     command = 'clear'
     if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
         command = 'cls'
     os.system(command)
-
 
 class Main:
     """ main app that run servers and get user commands """
@@ -31,11 +27,56 @@ class Main:
         # properties
         self.server = None
 
+        # currenly playing media info
+        self._media_info = {
+            'name': None,
+            'kind': None,
+            'season': None,
+            'episode': None,
+        }
+
         clear_console()  # Clear cmd when start
         self.choose_server()    # Run one time on start to select the server
         
 
         # To add args...
+    
+    @property
+    def _media_name(self) -> str:
+        return self._media_info['name']
+
+    @_media_name.setter
+    def _media_name(self, name: str) -> None:
+        self._media_info['name'] = name
+
+    @property
+    def _media_kind(self) -> Kinds:
+        return self._media_info['kind']
+
+    @_media_kind.setter
+    def _media_kind(self, kind: Kinds) -> None:
+        self._media_info['kind'] = kind
+
+    @property
+    def _media_season(self) -> int:
+        return self._media_info['season']
+
+    @_media_season.setter
+    def _media_season(self, season: int) -> None:
+        self._media_info['season'] = season
+    
+    @property
+    def _media_episode(self) -> int:
+        return self._media_info['episode']
+
+    @_media_episode.setter
+    def _media_episode(self, episode: int) -> None:
+        self._media_info['episode'] = episode    
+
+
+    def _clear_media_info(self):
+        for key in self._media_info.keys():
+            self._media_info[key] = None
          
     def choose_server(self):
         if self.server != None:
@@ -72,9 +113,9 @@ class Main:
     def run(self, first_run: bool = True) -> None:
         while True:
             # get user commands
-
             if not first_run:
                 clear_console()
+                self._clear_media_info()
                 if not self._continue("Continue: "):
                     break
             
@@ -83,30 +124,35 @@ class Main:
             search_options = self._get_search_options
             if not search_options['search_key'] or not search_options['perform_search']:
                 continue
+
+            # edit media info
+            self._media_kind = search_options['media_type']
             
             search_result = self.server.search(
-                search_options['search_key'], kind=search_options['media_type'])
+                search_options['search_key'], kind=self._media_kind)
             chosed_media_slug = self._choose_media(search_result)
 
-            if search_options['media_type'] == Kinds.MOVIES:
-                player = self._video_player(chosed_media_slug)
-                if player:
-                    continue
+            if self._media_kind == Kinds.MOVIES:
+                self._video_player(chosed_media_slug)
+                continue
 
-            elif search_options['media_type'] == Kinds.SERIES:
+            elif self._media_kind == Kinds.SERIES:
                 episodes = self.server.getEpisodes(chosed_media_slug)
 
                 while True:
                     chosed_episode_slug = self._get_episode_slug(episodes)
-                    player = self._video_player(chosed_episode_slug)
-                    if player and self._continue(msg="do you wnat to play another episode: "):
+                    self._video_player(chosed_episode_slug)
+                    if self._continue(msg="do you wnat to play another episode: "):
                         clear_console()
                         continue
                     break
-                
-    
+            # since this is the end it will return to 
+            #+ the beginning of the main loop, just like using continue
+
     # MPV Video Player
-    def _video_player(self, slug: str, active: bool = True) -> bool:
+    def _video_player(self, slug: str, verbose: bool = False) -> None:
+        """The video player method uses mpv as default. """
+
         chosed_quality_url: str = self._choose_quality(slug)
         trans_files: List = self._get_trans_files(slug)
 
@@ -117,21 +163,64 @@ class Main:
         
         cmd_args.append(f"{chosed_quality_url}")
 
-        # if any sub has been chosen
         if len(trans_files) >= 1:
             for t in trans_files:
                 cmd_args.append(f"--sub-file={t}")
 
-        # execute command line command
-        player_process = subprocess.Popen(cmd_args)
+        # no terminal output
+        cmd_args.append("--no-terminal")
 
-        print('$ ' + ' '.join(cmd_args))
-        while active:
-            if player_process.poll() != None:
-                break
+        if verbose:
+            print('$ ' + ' '.join(cmd_args))
 
-        player_process.terminate()
-        return True
+        # Save screenshots to data folder, with seperating medias
+        # First make sure the data folder exist, if not make one
+        if not os.path.exists(Defaults.DATA_FOLDER):
+            os.mkdir(Defaults.DATA_FOLDER)
+
+        # check for screenshots folder existance, or make one
+        if not os.path.exists(Defaults.SCREENSHOTS_FOLDER):
+            os.mkdir(Defaults.SCREENSHOTS_FOLDER)
+
+        media_screenshots_path = os.path.join(
+            Defaults.SCREENSHOTS_FOLDER,
+            self._media_name
+        )
+        # check if the playing media have already folder, if not make one
+        if not os.path.exists(media_screenshots_path):
+            os.mkdir(media_screenshots_path)
+
+        # Set directory, and quality for screenshots
+        cmd_args.extend([
+            # The path screenshots saved to
+            f"--screenshot-directory={media_screenshots_path}",
+            f"--screenshot-jpeg-quality={100}",
+        ])
+
+        # change screenshot filename template
+        if self._media_kind == Kinds.MOVIES:
+            cmd_args.append(
+                f"--screenshot-template=%P",    # %p: Current playback time
+            )
+
+        elif self._media_kind == Kinds.SERIES:
+            cmd_args.append(
+                f"--screenshot-template=s{self._media_season}-e{self._media_episode}-%P"
+            )
+
+        # start playing the video
+        video_player = MPVVideoPlayer()
+        while True:
+            video_process: bool = video_player.play_video(cmd_args)
+            if video_process:   # if process returned True
+                break   # end the loop
+            
+            # On error, Ask to retry playing the video
+            elif self._continue(msg="Error on playing the videos, Retry? "):
+                continue    
+            
+            else:   # Else end the loop and return to the main loop
+                break  
 
     def _continue(self, default: bool = True, msg: str = "do you wanna to continue") -> bool:
         choice =  prompt([
@@ -157,16 +246,13 @@ class Main:
 
             this_season[s['episode']] = s['slug']
 
-        season_number = self._get_season_number(seasons)
-        episode_number = self._get_episode_number(seasons, season_number)
+        season_number = self._media_season = self._get_season_number(seasons)
+        episode_number = self._media_episode = self._get_episode_number(seasons, season_number)
 
         return seasons[season_number][episode_number]
 
     def _get_trans_files(self, slug: str) -> List:
         trans_list = self.server.getTranslations(slug)
-
-        if trans_list == None:
-            return []   # return empty list
 
         _list = [ dict(
                 name=f"{tran['lang'].strip()} ({tran['extension'].strip()})",
@@ -291,6 +377,8 @@ class Main:
         ])
         for i in _list:
             if i['name'] == select_media['media_choice']:
+                # set_media_name
+                self._media_name = i['name']
                 return i['slug']
         
 
