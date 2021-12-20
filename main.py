@@ -10,7 +10,13 @@ import os
 
 class Defaults:
     SERVER = 'cinemana'
-    DATA_FOLDER = os.path.join(os.getcwd(), 'data')
+    DATA_FOLDER = os.path.join(
+        os.path.split(
+            # get real path if the running file is link from this file
+            os.path.realpath(__file__)  # This will return the file path not the directory
+        )[0],   #+ so I split it and choose only the dir path
+        'data'
+        )
     SCREENSHOTS_FOLDER = os.path.join(DATA_FOLDER, 'screenshots')
     KIND = Kinds.MOVIES
 
@@ -197,16 +203,18 @@ class Main:
             f"--screenshot-jpeg-quality={100}",
         ])
 
-        # change screenshot filename template
+        # change screenshot filename template, and set media title
         if self._media_kind == Kinds.MOVIES:
-            cmd_args.append(
+            cmd_args.extend([
                 f"--screenshot-template=%P",    # %p: Current playback time
-            )
+                f"--force-media-title={self._media_name}"
+            ])
 
         elif self._media_kind == Kinds.SERIES:
-            cmd_args.append(
-                f"--screenshot-template=s{self._media_season}-e{self._media_episode}-%P"
-            )
+            cmd_args.extend([
+                f"--screenshot-template=s{self._media_season}-e{self._media_episode}-%P",
+                f"--force-media-title={self._media_name} s{self._media_season} e{self._media_episode}",
+            ])
 
         # start playing the video
         video_player = MPVVideoPlayer()
