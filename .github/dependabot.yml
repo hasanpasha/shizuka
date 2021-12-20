@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/" #
+    schedule:
+      interval: "daily"
+      timezone: "Asia/Baghdad"
+      time: "20:00"
+    
+    target-branch: "master"
+    
+    labels:
+      - "pip dependencies"
