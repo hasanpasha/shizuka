@@ -10,7 +10,7 @@ from api.servers import Status
 from api.constants import Kinds
 
 def KindEQ(kind: Kinds) -> str:
-    opt = {Kinds.MOVIES: "movies", 
+    opt = {Kinds.MOVIES: "movies",
     Kinds.SERIES: "series"}
     return opt[kind]
 
@@ -35,13 +35,13 @@ class Cinemana(Server):
         resp = self.session_get(*args, **kwargs)
 
         if resp.status_code != 200:
-            return 
+            return
 
         return json.loads(resp.text)
-    
+
     def search(self, keyword: str, **kwargs) -> List[dict[str, str, str]]:
         """Search for the media."""
-        
+
         def buildURL(keyword, **kwargs):
             expected_params = {
                 "kind": {
@@ -54,14 +54,14 @@ class Cinemana(Server):
                 if ex in expected_params:
                     kweq = expected_params[ex]
                     params.update({kweq["site_eq"]: kweq["opt"](kwargs[ex])})
-            
+
             return self.search_url + urlencode(params) # URL to search result
 
         result_url = buildURL(keyword, **kwargs)
 
         # getting data
         json_data = self.get_data(result_url)
-        
+
         if json_data == None:
             return
 
@@ -107,11 +107,16 @@ class Cinemana(Server):
         if json_data == None:
             return
 
+        try:
+            trans = json_data['translations']
+        except KeyError:
+            return
+
         return [
             dict(
-                lang=trans['name'],
-                extension=trans['extention'],
-                fileURL=trans['file']
+                lang=tran['name'],
+                extension=tran['extention'],
+                fileURL=tran['file']
             )
-            for trans in json_data['translations']
+            for tran in trans
         ]

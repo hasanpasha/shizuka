@@ -29,7 +29,7 @@ def clear_console():
 class Main:
     """ main app that run servers and get user commands """
     def __init__(self) -> None:
-        
+
         # properties
         self.server = None
 
@@ -43,10 +43,10 @@ class Main:
 
         clear_console()  # Clear cmd when start
         self.choose_server()    # Run one time on start to select the server
-        
+
 
         # To add args...
-    
+
     @property
     def _media_name(self) -> str:
         return self._media_info['name']
@@ -70,20 +70,20 @@ class Main:
     @_media_season.setter
     def _media_season(self, season: int) -> None:
         self._media_info['season'] = season
-    
+
     @property
     def _media_episode(self) -> int:
         return self._media_info['episode']
 
     @_media_episode.setter
     def _media_episode(self, episode: int) -> None:
-        self._media_info['episode'] = episode    
+        self._media_info['episode'] = episode
 
 
     def _clear_media_info(self):
         for key in self._media_info.keys():
             self._media_info[key] = None
-         
+
     def choose_server(self):
         if self.server != None:
             return
@@ -93,7 +93,7 @@ class Main:
         servers_ids = [ dict(name=server['id']) for server in servers ]
 
         answers = prompt([
-            {   
+            {
                 'name': 'server_name',
                 'type': 'list',
                 'message': 'choose server: ',
@@ -124,7 +124,7 @@ class Main:
                 self._clear_media_info()
                 if not self._continue("Continue: "):
                     break
-            
+
             first_run = False
 
             search_options = self._get_search_options
@@ -133,7 +133,7 @@ class Main:
 
             # edit media info
             self._media_kind = search_options['media_type']
-            
+
             search_result = self.server.search(
                 search_options['search_key'], kind=self._media_kind)
             chosed_media_slug = self._choose_media(search_result)
@@ -152,7 +152,7 @@ class Main:
                         clear_console()
                         continue
                     break
-            # since this is the end it will return to 
+            # since this is the end it will return to
             #+ the beginning of the main loop, just like using continue
 
     # MPV Video Player
@@ -166,7 +166,7 @@ class Main:
 
         if chosed_quality_url == None:
             return False
-        
+
         cmd_args.append(f"{chosed_quality_url}")
 
         if len(trans_files) >= 1:
@@ -222,13 +222,13 @@ class Main:
             video_process: bool = video_player.play_video(cmd_args)
             if video_process:   # if process returned True
                 break   # end the loop
-            
+
             # On error, Ask to retry playing the video
             elif self._continue(msg="Error on playing the videos, Retry? "):
-                continue    
-            
+                continue
+
             else:   # Else end the loop and return to the main loop
-                break  
+                break
 
     def _continue(self, default: bool = True, msg: str = "do you wanna to continue") -> bool:
         choice =  prompt([
@@ -262,6 +262,9 @@ class Main:
     def _get_trans_files(self, slug: str) -> List:
         trans_list = self.server.getTranslations(slug)
 
+        if trans_list == None:
+            return []
+
         _list = [ dict(
                 name=f"{tran['lang'].strip()} ({tran['extension'].strip()})",
                 fileURL=tran['fileURL'])
@@ -291,7 +294,7 @@ class Main:
             return str(s_l_o_s)
 
         while True:
-        
+
             chosed_season = prompt([
                 {
                     'name': 'season',
@@ -300,11 +303,11 @@ class Main:
                     'when': lambda _: (len(seasons) > 1),
                 },
             ])
-            
+
 
             try:
                 s_n = chosed_season['season']
-                
+
                 # if choesn bigger >= first season number, and <= number of seasons
                 if int(s_n) >= int(default_season()) and int(s_n) <= len(seasons):
                     return s_n
@@ -335,23 +338,23 @@ class Main:
                 },
             ])
 
-            
+
             try:
                 e_n = chosed_episode['episode']
-                
+
                 # if choesn bigger >= first episode number, and <= number of episodes
-                if (int(e_n) >= int(default_episode()) and 
+                if (int(e_n) >= int(default_episode()) and
                 int(e_n) <= len((seasons[season_number]))):
                     return e_n
 
-            # if the user input is not number  
+            # if the user input is not number
             except ValueError:
                 print("Pleas Enter a number :(")
 
             # if there is just one episode
             except KeyError:
                 return default_episode()
-            
+
 
     def _choose_quality(self, slug: str) -> str:
         qualities = self.server.getVideos(slug)
@@ -368,11 +371,11 @@ class Main:
         for i in qualities:
             if i['reso'] == selected_quality:
                 return i['videoURL']
-        
+
 
 
     def _choose_media(self, media_list: List) -> str:
-        _list = [ dict(name=f"{media['name']} ({media['year']})", slug=media['slug']) 
+        _list = [ dict(name=f"{media['name']} ({media['year']})", slug=media['slug'])
         for media in media_list]
 
         select_media = prompt([
@@ -388,7 +391,7 @@ class Main:
                 # set_media_name
                 self._media_name = i['name']
                 return i['slug']
-        
+
 
     @property
     def _get_search_options(self) -> dict[str, str, str]:
