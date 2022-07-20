@@ -312,6 +312,8 @@ class Main:
                 if int(s_n) >= int(default_season()) and int(s_n) <= len(seasons):
                     return s_n
 
+                else: print("Enter a number in range :(")
+
             except KeyError:
                 return default_season()
 
@@ -346,6 +348,8 @@ class Main:
                 if (int(e_n) >= int(default_episode()) and
                 int(e_n) <= len((seasons[season_number]))):
                     return e_n
+
+                else: print("Enter a number in range :(")
 
             # if the user input is not number
             except ValueError:
@@ -414,6 +418,7 @@ class Main:
                 'message': 'Press any key to perform search or n to reset',
                 'default': True,
                 'when': lambda search_choices: search_choices['search_key'],
+                    
             }
         ])
 
