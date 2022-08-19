@@ -6,7 +6,7 @@ prompt-toolkit==3.0.24
 pycodestyle==2.8.0
 Pygments==2.10.0
 PyInquirer==1.0.3
-regex==2021.11.10
+regex==2022.8.17
 requests==2.26.0
 six==1.16.0
 toml==0.10.2
