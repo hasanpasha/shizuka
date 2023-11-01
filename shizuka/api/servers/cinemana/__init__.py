@@ -5,9 +5,9 @@ import json
 import requests
 from urllib.parse import urlencode
 
-from api.servers import Server
-from api.servers import Status
-from api.constants import Kinds
+from shizuka.api.servers import Server
+from shizuka.api.servers import Status
+from shizuka.api.constants import Kinds
 
 def KindEQ(kind: Kinds) -> str:
     opt = {Kinds.MOVIES: "movies", 

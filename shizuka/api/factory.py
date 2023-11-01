@@ -1,5 +1,5 @@
 
-from api import servers
+from shizuka.api import servers
 from typing import List
 
 class Factory:

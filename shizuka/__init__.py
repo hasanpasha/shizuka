@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from utils.server_utils import ServerUtils
-from utils.video_player import MPVVideoPlayer
-from api.constants import Kinds
+from shizuka.utils.server_utils import ServerUtils
+from shizuka.utils.video_player import MPVVideoPlayer
+from shizuka.api.constants import Kinds
 from PyInquirer import prompt
 from typing import List
 import os
@@ -414,7 +414,9 @@ class Main:
             }
         ])
 
-
-if __name__ == '__main__':
+def main():
     main_app = Main()
     main_app.run()
+
+if __name__ == '__main__':
+    main()

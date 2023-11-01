@@ -59,13 +59,13 @@ class Server(ABC):
     
 # @lru_cache()
 def get_servers_list(include_disabled=False):
-    import api.servers
+    import shizuka.api.servers
 
     def iter_namespace(ns_pkg):
         return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + '.')
 
     servers = []
-    for _finder, name, _ispkg in iter_namespace(api.servers):
+    for _finder, name, _ispkg in iter_namespace(shizuka.api.servers):
         module = importlib.import_module(name)
         for _name, obj in dict(inspect.getmembers(module)).items():
             if not hasattr(obj, 'id') or not hasattr(obj, 'name'):
@@ -76,7 +76,7 @@ def get_servers_list(include_disabled=False):
             if not include_disabled and obj.status == Status.DISABLED:
                 continue
 
-            if inspect.isclass(obj) and obj.__module__.startswith('api.servers.'):
+            if inspect.isclass(obj) and obj.__module__.startswith('shizuka.api.servers.'):
 
                 servers.append(dict(
                     id=obj.id,

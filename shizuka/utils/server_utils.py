@@ -1,5 +1,5 @@
 
-from api.factory import Factory
+from shizuka.api.factory import Factory
 from typing import List
 
 
