@@ -12,7 +12,7 @@ pyinquirer = "1.0.3"
 requests = "2.26.0"
 
 [tool.poetry.scripts]
-main = "shizuka:main"
+shizuka = "shizuka:main"
 
 [build-system]
 requires = ["poetry-core"]
