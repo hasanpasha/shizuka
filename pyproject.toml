@@ -2,11 +2,11 @@
 name = "shizuka"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["Hasan Pasha <bashahsn22@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8 <3.12"
+python = ">=3.9 <3.12"
 idna = "3.3"
 pyinquirer = "1.0.3"
 requests = "2.26.0"
