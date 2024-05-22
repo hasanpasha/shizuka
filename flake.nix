@@ -21,7 +21,7 @@
       {
         packages = {
           shizuka = mkPoetryApplication { 
-            projectDir = self;
+            projectDir = ./.;
             python = pkgs.python39;
             overrides = defaultPoetryOverrides.extend
               (self: super: {
