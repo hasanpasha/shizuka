@@ -7,16 +7,14 @@ from shizuka.api.constants import Kinds
 from PyInquirer import prompt
 from typing import List
 import os
+import appdirs
+
+APP_NAME = "shizuka"
+AUTHOR = "hasanpasha"
 
 class Defaults:
     SERVER = 'cinemana'
-    DATA_FOLDER = os.path.join(
-        os.path.split(
-            # get real path if the running file is link from this file
-            os.path.realpath(__file__)  # This will return the file path not the directory
-        )[0],   #+ so I split it and choose only the dir path
-        'data'
-        )
+    DATA_FOLDER = appdirs.user_data_dir(APP_NAME, AUTHOR)
     SCREENSHOTS_FOLDER = os.path.join(DATA_FOLDER, 'screenshots')
     KIND = Kinds.MOVIES
 
@@ -162,7 +160,7 @@ class Main:
         chosed_quality_url: str = self._choose_quality(slug)
         trans_files: List = self._get_trans_files(slug)
 
-        cmd_args = ['mpv', ]
+        cmd_args = ['mpv', "--hwdec", "--vo=gpu", "--fullscreen"]
 
         if chosed_quality_url == None:
             return False
