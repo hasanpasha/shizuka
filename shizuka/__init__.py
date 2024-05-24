@@ -160,7 +160,7 @@ class Main:
         chosed_quality_url: str = self._choose_quality(slug)
         trans_files: List = self._get_trans_files(slug)
 
-        cmd_args = ['mpv', "--hwdec", "--vo=gpu", "--fullscreen"]
+        cmd_args = ['mpv', "--fullscreen"]
 
         if chosed_quality_url == None:
             return False
